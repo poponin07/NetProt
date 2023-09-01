@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Net
 {
-    public class PlayerController : MonoBehaviour, IPunObservable
+    public class PlayerController : MonoBehaviourPunCallbacks//, IPunObservable
     {
         private Rigidbody m_rb;
         private PlayerInput m_input;
@@ -17,7 +17,7 @@ namespace Net
         [SerializeField, Range(0f, 30f)] private float m_moveSpeed = 5f;
         [SerializeField, Range(0f, 30f)] private float m_maxMoveSpeed = 5f;
         [SerializeField, Range(0f, 100f)] private float m_health = 50f;
-        [SerializeField, Range(0.1f, 10f)] private float m_rotatinDelay = 1f;
+        //[SerializeField, Range(0.1f, 10f)] private float m_rotatinDelay = 1f;
 
         [Space, SerializeField, Range(0.1f, 10f)]
         private float m_attackDelay = 0.5f;
@@ -34,16 +34,21 @@ namespace Net
         {
             m_rb = gameObject.GetComponent<Rigidbody>();
             m_input = new PlayerInput();
-            m_input.Player1.Enable();
+            m_input.Enable();
             Health = m_health;
+        }
+        
+
+        private void Start()
+        {
+           FindObjectOfType<GameManager>().AddPlayerContr(this);
         }
 
         void FixedUpdate()
         {
             if (!m_photonView.IsMine) return;
-                Vector2 direction = m_input.Player1.Movement.ReadValue<Vector2>();
             
-            if (direction.x == 0 && direction.y == 0) return;
+            Vector2 direction = m_input.Player1.Movement.ReadValue<Vector2>();
 
             var velocity = m_rb.velocity;
 
@@ -52,22 +57,32 @@ namespace Net
             velocity = Vector3.ClampMagnitude(velocity, m_maxMoveSpeed);
             m_rb.velocity = velocity;
         }
-        private void Start()
+        
+        public override void OnJoinedRoom()
         {
-            StartCoroutine(Focus());
-            StartCoroutine(Fire());
+            PhotonNetwork.LoadLevel("GameScene");
         }
         
-        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        /*public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
             if (stream.IsWriting)
             {
-                stream.SendNext(Debugger.PlayerData.Create(this));
+                stream.SendNext(PlayerData.Create(this));
             }
             else
             {
-                ((Debugger.PlayerData)stream.ReceiveNext()).Set(this);
+                ((PlayerData)stream.ReceiveNext()).Set(this);
             }
+        }*/
+
+        public void SetTarget(Transform target)
+        {
+            m_target = target;
+            if (!m_photonView.IsMine) return;
+            
+            m_input.Player1.Enable();
+            StartCoroutine(Focus());
+            StartCoroutine(Fire());
         }
 
         private void OnTriggerEnter(Collider other)
@@ -88,7 +103,8 @@ namespace Net
             {
                 transform.LookAt(m_target);
                 transform.eulerAngles = new Vector3(0f, transform.eulerAngles.y, 0f);
-                yield return new WaitForSeconds(m_rotatinDelay);
+                //yield return new WaitForSeconds(m_rotatinDelay);
+                yield return null;
             }
         }
         private  IEnumerator Fire()
