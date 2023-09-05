@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Net
 {
-    public class ProjectileController : MonoBehaviourPunCallbacks, IPunObservable
+    public class ProjectileController : MonoBehaviourPunCallbacks//, IPunObservable
     {
         [SerializeField, Range(0f, 30f)] private float m_moveSpeed = 3f;
         [SerializeField, Range(0f, 100f)] private float m_damage = 10f;
@@ -20,7 +20,6 @@ namespace Net
         void FixedUpdate()
         {
             transform.position += transform.forward * m_moveSpeed * Time.deltaTime;
-            
         }
 
         public float GetDamage()

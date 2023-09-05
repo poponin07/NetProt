@@ -20,10 +20,6 @@ namespace Net
         private PlayerController m_playerController1;
         private PlayerController m_playerController2;
         private float m_randomInervalPos;
-        private void Awake()
-        {
-           
-        }
 
         private void Start()
         {

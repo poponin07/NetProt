@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Photon.Pun;
+using Photon.Pun.Demo.Asteroids;
 using UnityEngine;
 
 namespace Net
@@ -17,6 +18,7 @@ namespace Net
         [SerializeField, Range(0f, 30f)] private float m_moveSpeed = 5f;
         [SerializeField, Range(0f, 30f)] private float m_maxMoveSpeed = 5f;
         [SerializeField, Range(0f, 100f)] private float m_health = 50f;
+        [SerializeField] private UIManager m_uiManager;
         //[SerializeField, Range(0.1f, 10f)] private float m_rotatinDelay = 1f;
 
         [Space, SerializeField, Range(0.1f, 10f)]
@@ -93,7 +95,11 @@ namespace Net
 
             m_health -= bullet.GetDamage();
 
-            if (m_health <= 0) Debug.Log($"Player with name {name} is dead!");
+            if (m_health <= 0)
+            {
+                Debug.Log($"Player with name {name} is dead!");
+                m_uiManager.EndGame();
+            }
             
         }
 
@@ -111,7 +117,8 @@ namespace Net
         {
             while (true)
             {
-                var bullet = Instantiate(m_bulletPrefab, m_firePoint.position, transform.rotation);
+               // var bullet = Instantiate(m_bulletPrefab, m_firePoint.position, transform.rotation);
+               var bullet = PhotonNetwork.Instantiate("Bullet", m_firePoint.transform.position, transform.rotation);
                 yield return new WaitForSeconds(m_attackDelay); 
             }
         }
