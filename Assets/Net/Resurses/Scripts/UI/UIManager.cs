@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using TMPro;
+using UnityEngine.SceneManagement;
+
 namespace Net
 {
     public class UIManager : MonoBehaviour
@@ -12,9 +15,9 @@ namespace Net
         [SerializeField] private GameObject m_endGameUI;
         [SerializeField] private Text m_endgameTextUI;
 
-        public void EndGame(string player)
+        public void EndGame(string text)
         {
-          StartCoroutine(EndGameCor(player));
+          StartCoroutine(EndGameCor(text));
         }
 
         private void ActivePopUpEndGame()
@@ -22,12 +25,13 @@ namespace Net
             m_endGameUI.SetActive(true);
         }
 
-        private IEnumerator EndGameCor(string player)
+        private IEnumerator EndGameCor(string text)
         {
-            m_endgameTextUI.text = player;
+            m_endgameTextUI.text = text;
             ActivePopUpEndGame();
-            yield return null;
-            PhotonNetwork.LoadLevel("MenuScene");
+            yield return new WaitForSeconds(3);
+            PhotonNetwork.Disconnect();
+            SceneManager.LoadScene(0);
         }
 
     }

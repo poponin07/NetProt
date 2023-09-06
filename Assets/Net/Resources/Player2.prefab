@@ -153,6 +153,8 @@ MonoBehaviour:
   m_moveSpeed: 18.8
   m_maxMoveSpeed: 8.2
   m_health: 50
+  m_uiManager: {fileID: 0}
+  m_GameManager: {fileID: 0}
   m_attackDelay: 1
   m_firePoint: {fileID: 8466271019415343983}
 --- !u!54 &5201293274026311082

@@ -19,7 +19,10 @@ namespace Net
         [SerializeField, Range(0f, 30f)] private float m_maxMoveSpeed = 5f;
         [SerializeField, Range(0f, 100f)] private float m_health = 50f;
         [SerializeField] private UIManager m_uiManager;
+        [SerializeField] private GameManager m_GameManager;
         //[SerializeField, Range(0.1f, 10f)] private float m_rotatinDelay = 1f;
+        private Coroutine m_focusCor;
+        private Coroutine m_fireCor;
 
         [Space, SerializeField, Range(0.1f, 10f)]
         private float m_attackDelay = 0.5f;
@@ -43,7 +46,10 @@ namespace Net
 
         private void Start()
         {
-           FindObjectOfType<GameManager>().AddPlayerContr(this);
+           //FindObjectOfType<GameManager>().AddPlayerContr(this);
+           m_uiManager = FindObjectOfType<UIManager>();
+           m_GameManager = FindObjectOfType<GameManager>();
+           m_GameManager.AddPlayerContr(this);
         }
 
         void FixedUpdate()
@@ -83,8 +89,8 @@ namespace Net
             if (!m_photonView.IsMine) return;
             
             m_input.Player1.Enable();
-            StartCoroutine(Focus());
-            StartCoroutine(Fire());
+           m_focusCor = StartCoroutine(Focus());
+           m_fireCor =  StartCoroutine(Fire());
         }
 
         private void OnTriggerEnter(Collider other)
@@ -98,11 +104,20 @@ namespace Net
             if (m_health <= 0)
             {
                 Debug.Log($"Player with name {name} is dead!");
-                m_uiManager.EndGame();
+                m_GameManager.EndGame(this);
             }
-            
         }
 
+        public void EndGame(string text)
+        {
+            if (photonView.IsMine)
+            {
+                StopCoroutine(m_fireCor);
+                StopCoroutine(m_focusCor);   
+            }
+                m_uiManager.EndGame(text);
+                m_input.Disable();
+        }
         private  IEnumerator Focus()
         {
             while (true)

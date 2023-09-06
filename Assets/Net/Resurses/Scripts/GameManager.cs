@@ -51,6 +51,24 @@ namespace Net
             }
         }
 
+        public void EndGame(PlayerController losePlayer)
+        {
+            PlayerController loser;
+            PlayerController winner;
+            if (losePlayer == m_playerController1)
+            {
+                loser = losePlayer;
+                winner = m_playerController2;
+            }
+            else
+            {
+                loser = m_playerController2;
+                winner = losePlayer;
+            }
+            loser.EndGame("You have lost :(");
+            winner.EndGame("You have won :D");
+        }
+        
         private void OnQuit(InputAction.CallbackContext context)
         {
             PhotonNetwork.LeaveRoom();
