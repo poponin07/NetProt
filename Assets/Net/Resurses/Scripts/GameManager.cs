@@ -20,6 +20,8 @@ namespace Net
         private PlayerController m_playerController1;
         private PlayerController m_playerController2;
         private float m_randomInervalPos;
+        [SerializeField] private CameraController m_cameraController;
+
 
         private void Start()
         {
@@ -29,6 +31,8 @@ namespace Net
             
             Vector3 pos = new Vector3(Random.Range(-m_randomInervalPos,m_randomInervalPos), 0f, Random.Range(-m_randomInervalPos,m_randomInervalPos));
             var GO = PhotonNetwork.Instantiate(PhotonNetwork.NickName, pos, new Quaternion());
+
+            m_cameraController.Initialization(GO);
             
             //PhotonPeer.RegisterType(typeof(PlayerData), 100, Debugger.SerializePlayerData, Debugger.DeserializePlayerData);
         }
@@ -57,13 +61,13 @@ namespace Net
             PlayerController winner;
             if (losePlayer == m_playerController1)
             {
-                loser = losePlayer;
+                loser = m_playerController1;
                 winner = m_playerController2;
             }
             else
             {
                 loser = m_playerController2;
-                winner = losePlayer;
+                winner = m_playerController1;
             }
             loser.EndGame("You have lost :(");
             winner.EndGame("You have won :D");

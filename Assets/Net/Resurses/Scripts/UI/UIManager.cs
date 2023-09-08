@@ -15,23 +15,29 @@ namespace Net
         [SerializeField] private GameObject m_endGameUI;
         [SerializeField] private Text m_endgameTextUI;
 
-        public void EndGame(string text)
+        public void EndGame(Text text)
         {
-          StartCoroutine(EndGameCor(text));
+            m_endgameTextUI = text;
+            StartCoroutine(EndGameCor());
         }
 
-        private void ActivePopUpEndGame()
+        public Text SetFinalText()
         {
-            m_endGameUI.SetActive(true);
+            return m_endgameTextUI;
+        }
+        private void ActivePopUpEndGame(bool value)
+        {
+            m_endGameUI.SetActive(value);
         }
 
-        private IEnumerator EndGameCor(string text)
+        private IEnumerator EndGameCor()
         {
-            m_endgameTextUI.text = text;
-            ActivePopUpEndGame();
+           // m_endgameTextUI.text = text;
+            ActivePopUpEndGame(true);
             yield return new WaitForSeconds(3);
-            PhotonNetwork.Disconnect();
-            SceneManager.LoadScene(0);
+            ActivePopUpEndGame(false);
+            PhotonNetwork.LoadLevel("MenuScene");
+            PhotonNetwork.LeaveRoom();
         }
 
     }

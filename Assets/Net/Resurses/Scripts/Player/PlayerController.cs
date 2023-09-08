@@ -5,6 +5,7 @@ using System.Linq;
 using Photon.Pun;
 using Photon.Pun.Demo.Asteroids;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Net
 {
@@ -104,7 +105,8 @@ namespace Net
             if (m_health <= 0)
             {
                 Debug.Log($"Player with name {name} is dead!");
-                m_GameManager.EndGame(this);
+                //gameObject.SetActive(false);
+                //m_GameManager.EndGame(this);
             }
         }
 
@@ -113,10 +115,13 @@ namespace Net
             if (photonView.IsMine)
             {
                 StopCoroutine(m_fireCor);
-                StopCoroutine(m_focusCor);   
-            }
-                m_uiManager.EndGame(text);
+                StopCoroutine(m_focusCor);
+
+               Text finalText = m_uiManager.SetFinalText();
+               finalText.text = text;
+                m_uiManager.EndGame(finalText);
                 m_input.Disable();
+            }
         }
         private  IEnumerator Focus()
         {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 using Debug = UnityEngine.Debug;
 
 namespace Net
@@ -13,6 +14,10 @@ namespace Net
         [SerializeField] private string nickName;
         private void Start()
         {
+            if (PhotonNetwork.NetworkClientState == ClientState.Joined)
+            {
+                PhotonNetwork.Disconnect();
+            }
 
 #if UNITY_EDITOR
             PhotonNetwork.NickName = nickName + "1";
