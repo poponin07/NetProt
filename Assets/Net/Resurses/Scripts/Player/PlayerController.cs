@@ -22,6 +22,7 @@ namespace Net
         [SerializeField] private UIManager m_uiManager;
         [SerializeField] private GameManager m_GameManager;
         //[SerializeField, Range(0.1f, 10f)] private float m_rotatinDelay = 1f;
+        private float m_borderTimer;
         private Coroutine m_focusCor;
         private Coroutine m_fireCor;
 
@@ -65,6 +66,8 @@ namespace Net
             velocity.y = 0f;
             velocity = Vector3.ClampMagnitude(velocity, m_maxMoveSpeed);
             m_rb.velocity = velocity;
+            
+            BorderDamage();
         }
         
         public override void OnJoinedRoom()
@@ -102,14 +105,41 @@ namespace Net
 
             m_health -= bullet.GetDamage();
 
-            if (m_health <= 0)
+            HealthCheck();
+        }
+
+        private void BorderDamage()
+        {
+            var pos = transform.position;
+            if (pos.x > 35F || pos.x < -35f ||  pos.z > 35F || pos.z < -35f)
             {
-                Debug.Log($"Player with name {name} is dead!");
-                //gameObject.SetActive(false);
-                //m_GameManager.EndGame(this);
+                m_borderTimer += Time.deltaTime;
+            }
+
+            if (m_borderTimer >= 1)
+            {
+                Debug.Log("BorderTick");
+                m_health--;
+                m_borderTimer = 0;
+                HealthCheck();
+            }
+
+            if (pos.y <= -1f)
+            {
+                m_health -= int.MaxValue;
+                HealthCheck();
             }
         }
 
+        private void HealthCheck()
+        {
+            if (m_health <= 0)
+            {
+                Debug.Log($"Player with name {name} is dead!");
+                gameObject.SetActive(false);
+                m_GameManager.EndGame(this);
+            }
+        }
         public void EndGame(string text)
         {
             if (photonView.IsMine)
